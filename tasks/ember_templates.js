@@ -47,7 +47,7 @@ module.exports = function(grunt) {
 
     if (contents.length > 0) {
       grunt.file.write(dest, contents.join('\n\n'));
-      grunt.log.writeln('File "' + dest + '" created.');
+      // grunt.log.writeln('File "' + dest + '" created.');
     }
   };
 
@@ -129,9 +129,9 @@ module.exports = function(grunt) {
             name: name,
             contents: options.templateRegistration(name, contents)
           });
-
-        } catch(e) {
-          grunt.log.error(e);
+        } catch (e) {
+          grunt.log.error(e.message);
+          grunt.log.error(e.stack);
           grunt.fail.warn('Ember Handlebars failed to compile ' + file + '.');
         }
       });
@@ -155,6 +155,8 @@ module.exports = function(grunt) {
       }
 
     });
+
+    grunt.log.writeln('Created "' + this.files.length + '" files.');
   };
 
   grunt.registerMultiTask('emberTemplates', 'Compile Handlebars templates for Ember.', emberTemplatesTask);
