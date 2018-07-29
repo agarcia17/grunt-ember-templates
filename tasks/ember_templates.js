@@ -6,13 +6,13 @@
  * https://github.com/dgeb/grunt-ember-templates/blob/master/LICENSE
  */
 
-function manualCompile(handlebarsPath, templateCompilerPath, template){
+function manualCompile(handlebarsPath, templateCompilerPath, template) {
   'use strict';
 
-  var fs                 = require('fs'),
-      vm                 = require('vm'),
-      handlebarsJs       = fs.readFileSync(handlebarsPath, 'utf8'),
-      templateCompilerJs = fs.readFileSync(templateCompilerPath, 'utf8');
+  var fs = require('fs'),
+    vm = require('vm'),
+    handlebarsJs = fs.readFileSync(handlebarsPath, 'utf8'),
+    templateCompilerJs = fs.readFileSync(templateCompilerPath, 'utf8');
 
   // Create a context into which we will load both the ember template compiler
   // as well as the template to be compiled. The ember template compiler expects
@@ -34,13 +34,13 @@ function manualCompile(handlebarsPath, templateCompilerPath, template){
   return context.compiledJS;
 };
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
   'use strict';
 
   var compiler = require('ember-template-compiler');
   var path = require('path');
 
-  var writeFile = function(contents, dest, options) {
+  var writeFile = function (contents, dest, options) {
     if (options.amd) {
       contents = contents.concat('});');
     }
@@ -51,17 +51,17 @@ module.exports = function(grunt) {
     }
   };
 
-  var emberTemplatesTask = function() {
+  var emberTemplatesTask = function () {
     var options = this.options({
       templateFileExtensions: /\.(hbs|hjs|handlebars)/,
       amd: false,
       concatenate: true,
       precompile: true,
-      templateName: function(name) { return name; },
-      templateNameFromFile: function(file) {
+      templateName: function (name) { return name; },
+      templateNameFromFile: function (file) {
         // `templateBaseDir` is an alias for `templateBasePath`
         var templateBasePath = options.templateBasePath || options.templateBaseDir;
-        [templateBasePath, options.templateFileExtensions].forEach(function(match) {
+        [templateBasePath, options.templateFileExtensions].forEach(function (match) {
           if (match) {
             file = file.replace(match, '');
           }
@@ -74,7 +74,7 @@ module.exports = function(grunt) {
 
         return options.templateName(file);
       },
-      templateRegistration: function(name, contents) {
+      templateRegistration: function (name, contents) {
         return 'Ember.TEMPLATES[' + JSON.stringify(name) + '] = ' + contents + ';'
       },
       handlebarsPath: null,
@@ -84,12 +84,12 @@ module.exports = function(grunt) {
     grunt.verbose.writeflags(options, 'Options');
 
     // Iterate files
-    this.files.forEach(function(f) {
+    this.files.forEach(function (f) {
       var processedTemplates = [],
-          output = [],
-          name,
-          customAmd,
-          contents;
+        output = [],
+        name,
+        customAmd,
+        contents;
 
       if (options.amd) {
         customAmd = typeof options.amd === 'string' && options.amd !== 'true';
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
         output = output.concat('define(["' + customAmd + '"], function(Ember){');
       }
 
-      f.src.forEach(function(file) {
+      f.src.forEach(function (file) {
         try {
 
           name = options.templateNameFromFile(file);
@@ -139,7 +139,7 @@ module.exports = function(grunt) {
       if (options.concatenate) {
         // Map over the 'contents' property and concatenate
         output = output.concat(
-          processedTemplates.map(function(template) {
+          processedTemplates.map(function (template) {
             return template.contents;
           }));
 
@@ -147,22 +147,22 @@ module.exports = function(grunt) {
 
       } else {
         // Write a file for each template
-        processedTemplates.forEach(function(template) {
+        processedTemplates.forEach(function (template) {
           writeFile(output.concat(template.contents),
-                    path.join(f.dest, template.name + '.js'),
-                    options);
+            path.join(f.dest, template.name + '.js'),
+            options);
         });
       }
 
     });
 
-    grunt.log.writeln('Created "' + this.files.length + '" files.');
+    grunt.log.writeln('Created ' + this.files.length + ' files.');
   };
 
   grunt.registerMultiTask('emberTemplates', 'Compile Handlebars templates for Ember.', emberTemplatesTask);
 
   // TODO: remove deprecated `ember_templates` task from v0.5
-  grunt.registerMultiTask('ember_templates', 'Compile Handlebars templates for Ember. [DEPRECATED: please use `emberTemplates` instead]', function() {
+  grunt.registerMultiTask('ember_templates', 'Compile Handlebars templates for Ember. [DEPRECATED: please use `emberTemplates` instead]', function () {
     grunt.log.warn('`ember_templates` is deprecated and will be removed in v0.5. Please use `emberTemplates` instead.');
     emberTemplatesTask.apply(this, arguments);
   });
